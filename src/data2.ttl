@@ -1,0 +1,9 @@
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> . @prefix baseUrl: <http://example.data/event/> .
+ baseUrl:9d639422-1c69-4265-8a9e-9619dea0e7ae baseUrl:id "7"; baseUrl:startDate "2022-08-25"^^xsd:date; baseUrl:endDate "2022-08-28"^^xsd:date. 
+baseUrl:97b5e647-812a-4a2a-878d-a1c3f09e14e0 baseUrl:id "6"; baseUrl:startDate "2022-08-26"^^xsd:date; baseUrl:endDate "2022-08-31"^^xsd:date. 
+baseUrl:9f1351cc-c8c7-4938-bcbf-6a1647b575cc baseUrl:id "e"; baseUrl:startDate "2022-12-10"^^xsd:date; baseUrl:endDate "2022-12-15"^^xsd:date.
+ baseUrl:7d690aae-eb6a-4906-a24c-a6daae818fe3 baseUrl:id "9"; baseUrl:startDate "2022-06-20"^^xsd:date; baseUrl:endDate "2022-06-25"^^xsd:date. 
+baseUrl:5f22212a-2912-48e7-b701-96ed88d6821c baseUrl:id "9"; baseUrl:startDate "2022-08-12"^^xsd:date; baseUrl:endDate "2022-08-14"^^xsd:date. 
+baseUrl:e1229bc8-18ff-456e-a511-a6a2bee22797 baseUrl:id "b"; baseUrl:startDate "2022-06-20"^^xsd:date; baseUrl:endDate "2022-06-30"^^xsd:date. 
+baseUrl:1990d1df-23c0-4d56-abeb-0f7ba8aa363a baseUrl:id "a7"; baseUrl:startDate "2021-08-25"^^xsd:date; baseUrl:endDate "2021-08-28"^^xsd:date.
+ baseUrl:29a09601-224d-4311-ba53-ff8c0c3f38c0 baseUrl:id "a6"; baseUrl:startDate "2021-08-26"^^xsd:date; baseUrl:endDate "2021-08-31"^^xsd:date. baseUrl:6ae5dde1-282c-462d-8c4c-888eeb535c49 baseUrl:id "ae"; baseUrl:startDate "2021-12-10"^^xsd:date; baseUrl:endDate "2021-12-15"^^xsd:date. baseUrl:9a136411-734e-4273-86e6-58557b95698f baseUrl:id "a9"; baseUrl:startDate "2021-06-20"^^xsd:date; baseUrl:endDate "2021-06-25"^^xsd:date. baseUrl:af64e76d-2fa0-41d1-90d1-bc73e6de1af4 baseUrl:id "a9"; baseUrl:startDate "2021-08-12"^^xsd:date; baseUrl:endDate "2021-08-14"^^xsd:date. baseUrl:e9218014-df67-4a41-bc96-90894835dd1b baseUrl:id "ab"; baseUrl:startDate "2021-06-20"^^xsd:date; baseUrl:endDate "2021-06-30"^^xsd:date. 
