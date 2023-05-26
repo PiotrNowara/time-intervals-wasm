@@ -1,55 +1,65 @@
 use wasm_bindgen::prelude::*;
 mod oxi_db;
+mod csv_to_rdf;
 
 // How to build?
 //  cargo build --target wasm32-unknown-unknown
 //  wasm-bindgen target/wasm32-unknown-unknown/debug/wasm_oxi_time.wasm --out-dir ./web/ --target web
 //  wasm-bindgen target/wasm32-unknown-unknown/release/wasm_oxi_time.wasm --out-dir ./web/ --target web
 
-//HOW to run? Go to ./web and run Python server: python3 -m http.server  
+// HOW to run? Go to ./web and run Python server: python3 -m http.server  
 
 #[wasm_bindgen]
 pub fn analyze_file(file_input: web_sys::HtmlInputElement) -> Result<(), JsError> {
-    //Check the file list from the input
-    // file_input.fi
+
+    log("Starting processing... v.0.1");
     let filelist = file_input.files().expect_throw("No file given.");
-    //Do not allow blank inputs
-    if filelist.length() < 1 {
-        alert("Please select at least one file.");
-        JsError::new("Please select at least one file.");
-    }
-    if filelist.get(0) == None {
-        alert("Please select a valid file");
-        JsError::new("Please select a valid file");
-    }
+    filelist.get(0).expect_throw("Please select a valid file");
+    // if filelist.length() < 1 {
+    //     alert("Please select at least one file.");
+    //     return Err(JsError::new("Please select at least one file."));
+    // }
+    // if filelist.get(0) == None {
+    //     alert("Please select a valid file");
+    //     return Err(JsError::new("Please select a valid file"));
+    // }
     
-    let file = filelist.get(0).unwrap();
+    let file = filelist.get(0).ok_or(JsError::new("Unable to retrieve a file from HTML component."))?;
 
     let file_reader : web_sys::FileReader = match web_sys::FileReader::new() {
         Ok(f) => f,
         Err(e) => {
             alert("There was an error creating a file reader");
-            // println!(&JsValue::as_string(&e).expect("error converting jsvalue to string."));
-            web_sys::FileReader::new().expect_throw("There was an error creating a file reader")
+            return Err(JsError::new(&format!("Error creating a file reader: {:?}", e)));
         }
     };
 
-    let fr_c = file_reader.clone();
+    let fr_c = file_reader.clone(); 
     // create onLoadEnd callback
+    let filename = file.name();
+    log(&format!("Submitted file: {}", filename));
     let onloadend_cb = Closure::wrap(Box::new(move |_e: web_sys::ProgressEvent| {
-        let array = js_sys::Uint8Array::new(&fr_c.result().unwrap());
+        let array = js_sys::Uint8Array::new(&fr_c.result().expect_throw("Error when processing CSV data input string: {}"));
         let mut slice = vec![0; array.length() as usize];
         array.copy_to(&mut slice[..]); //TODO: if this does not work then use array.to_vec()
 
         // handler code
-        log("In process...");
-        let res_str = oxi_db::process_data(&slice).expect_throw("Error when analyzing data.");
-        // alert(&res_str);
+        log(&format!("In process... file: {}", filename));
+        if filename.ends_with(".csv")
+        {
+            log("Parsing CSV file.");
+            slice = csv_to_rdf::csv_to_rdf(&slice)
+                .map_err(|e| JsError::new(&format!("Error when processing CSV data input string: {}", e.to_string())))?;
+        }
+        log(&format!("RDF content: {:?}", std::str::from_utf8(&slice).unwrap()));
+        let res_str = oxi_db::process_data(&slice)
+            .map_err(|e| JsError::new(&format!("Error when processing RDF data input string: {}", e.to_string())))?;
         handleResult(&res_str);
-    }) as Box<dyn Fn(web_sys::ProgressEvent)>);
+        Ok(())
+    }) as Box<dyn Fn(web_sys::ProgressEvent) -> Result<(), JsError>>);
 
     file_reader.set_onloadend(Some(onloadend_cb.as_ref().unchecked_ref()));
-    file_reader.read_as_array_buffer(&file).expect("blob not readable");
+    file_reader.read_as_array_buffer(&file).expect_throw("Unable to read the submitted file.");
     onloadend_cb.forget();
     Ok(())
 }
@@ -57,13 +67,28 @@ pub fn analyze_file(file_input: web_sys::HtmlInputElement) -> Result<(), JsError
 #[wasm_bindgen]
 pub fn analyze_string(input_string: String) -> Result<(), JsError> {
     if input_string.is_empty() {
-        alert("Please enter non-empty data string.");
-        JsError::new("Please enter non-empty data string.");
+        alert("Please enter a non-empty RDF data string.");
+        JsError::new("Please enter a non-empty RDF data string.");
+    }
+    log("In process...");
+    let res_str = oxi_db::process_data(input_string.as_bytes())
+        .map_err(|e| JsError::new(&format!("Error when processing RDF data input string: {}", e.to_string())))?;
+    handleResult(&res_str);
+    Ok(())
+}
+
+#[wasm_bindgen]
+pub fn analyze_csv_string(input_string: String) -> Result<(), JsError> {
+    if input_string.is_empty() {
+        alert("Please enter a non-empty CSV data string.");
+        JsError::new("Please enter a non-empty CSV data string.");
     }
     // handler code
     log("In process...");
-    let res_str = oxi_db::process_data(input_string.as_bytes()).expect_throw("Error when analyzing data.");
-    // alert(&res_str);
+    let st = csv_to_rdf::csv_to_rdf(input_string.as_bytes())
+        .map_err(|e| JsError::new(&format!("Error when processing CSV data input string: {}", e.to_string())))?;
+    let res_str = oxi_db::process_data(&st)
+        .map_err(|e| JsError::new(&format!("Error when processing RDF data input string: {}", e.to_string())))?;
     handleResult(&res_str);
     Ok(())
 }

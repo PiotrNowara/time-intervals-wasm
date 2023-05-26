@@ -55,7 +55,7 @@ pub fn process_data(data: &[u8]) -> Result<String,Box<dyn Error>>
 {
     let reader = BufReader::new(data);
     let store = Store::new()?;
-    store.load_graph(BufReader::new(reader), GraphFormat::Turtle, GraphNameRef::DefaultGraph, None);
+    store.load_graph(BufReader::new(reader), GraphFormat::Turtle, GraphNameRef::DefaultGraph, None)?;
 
     // let now = SystemTime::now(); //TODO: check why it panicks!
     let res_graph = store.query(CONSTRUCT_OVERLAPS)?;
