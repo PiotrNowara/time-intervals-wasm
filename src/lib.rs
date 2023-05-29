@@ -9,20 +9,17 @@ mod csv_to_rdf;
 
 // HOW to run? Go to ./web and run Python server: python3 -m http.server  
 
+// Assumptions for CSV transformations:
+// id column has to be present - it will be used to construct event URL: <baseUrl/uuid/id>. It will not be present in the transformed RDF data.
+// start_time,end_time prefixed columns have to be present (can be named just: start_time,end_time)
+// SPARQL is type sensitive so using "2022-08-10" as a xsd:dateTime will not work (pattern will not be matched) - exact timestamps or dates have to be provided. Data will be transformed according to provided values.
+
 #[wasm_bindgen]
 pub fn analyze_file(file_input: web_sys::HtmlInputElement) -> Result<(), JsError> {
 
     log("Starting processing... v.0.1");
     let filelist = file_input.files().expect_throw("No file given.");
     filelist.get(0).expect_throw("Please select a valid file");
-    // if filelist.length() < 1 {
-    //     alert("Please select at least one file.");
-    //     return Err(JsError::new("Please select at least one file."));
-    // }
-    // if filelist.get(0) == None {
-    //     alert("Please select a valid file");
-    //     return Err(JsError::new("Please select a valid file"));
-    // }
     
     let file = filelist.get(0).ok_or(JsError::new("Unable to retrieve a file from HTML component."))?;
 
@@ -87,6 +84,7 @@ pub fn analyze_csv_string(input_string: String) -> Result<(), JsError> {
     log("In process...");
     let st = csv_to_rdf::csv_to_rdf(input_string.as_bytes())
         .map_err(|e| JsError::new(&format!("Error when processing CSV data input string: {}", e.to_string())))?;
+    log(&format!("RDF content: {:?}", std::str::from_utf8(&st).unwrap()));//TODO: delete after testing
     let res_str = oxi_db::process_data(&st)
         .map_err(|e| JsError::new(&format!("Error when processing RDF data input string: {}", e.to_string())))?;
     handleResult(&res_str);
