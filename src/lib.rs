@@ -17,7 +17,7 @@ mod csv_to_rdf;
 #[wasm_bindgen]
 pub fn analyze_file(file_input: web_sys::HtmlInputElement) -> Result<(), JsError> {
 
-    log("Starting processing... v.0.1");
+    log("Starting processing... v.0.1.1");
     let filelist = file_input.files().expect_throw("No file given.");
     filelist.get(0).expect_throw("Please select a valid file");
     
@@ -48,7 +48,7 @@ pub fn analyze_file(file_input: web_sys::HtmlInputElement) -> Result<(), JsError
             slice = csv_to_rdf::csv_to_rdf(&slice)
                 .map_err(|e| JsError::new(&format!("Error when processing CSV data input string: {}", e.to_string())))?;
         }
-        log(&format!("RDF content: {:?}", std::str::from_utf8(&slice).unwrap()));
+        // log(&format!("RDF content: {:?}", std::str::from_utf8(&slice).unwrap()));
         let res_str = oxi_db::process_data(&slice)
             .map_err(|e| JsError::new(&format!("Error when processing RDF data input string: {}", e.to_string())))?;
         handleResult(&res_str);
@@ -63,6 +63,7 @@ pub fn analyze_file(file_input: web_sys::HtmlInputElement) -> Result<(), JsError
 
 #[wasm_bindgen]
 pub fn analyze_string(input_string: String) -> Result<(), JsError> {
+    log("Starting processing... v.0.1.1");
     if input_string.is_empty() {
         alert("Please enter a non-empty RDF data string.");
         JsError::new("Please enter a non-empty RDF data string.");
@@ -76,6 +77,7 @@ pub fn analyze_string(input_string: String) -> Result<(), JsError> {
 
 #[wasm_bindgen]
 pub fn analyze_csv_string(input_string: String) -> Result<(), JsError> {
+    log("Starting processing... v.0.1.1");
     if input_string.is_empty() {
         alert("Please enter a non-empty CSV data string.");
         JsError::new("Please enter a non-empty CSV data string.");
@@ -84,7 +86,7 @@ pub fn analyze_csv_string(input_string: String) -> Result<(), JsError> {
     log("In process...");
     let st = csv_to_rdf::csv_to_rdf(input_string.as_bytes())
         .map_err(|e| JsError::new(&format!("Error when processing CSV data input string: {}", e.to_string())))?;
-    log(&format!("RDF content: {:?}", std::str::from_utf8(&st).unwrap()));//TODO: delete after testing
+    // log(&format!("RDF content: {:?}", std::str::from_utf8(&st).unwrap()));//TODO: delete after testing
     let res_str = oxi_db::process_data(&st)
         .map_err(|e| JsError::new(&format!("Error when processing RDF data input string: {}", e.to_string())))?;
     handleResult(&res_str);

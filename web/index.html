@@ -8,10 +8,11 @@
 
             //This fn is imported in Rust! don't change the name!
             function handleResult(str) {
-                console.log("Handling result in JS...\n" + str)
+                // console.log("Handling result in JS...\n" + str)
                 console.log("Result size:" + str.length)
                 download_file("results.ttl", str, "text/turtle")
                 displayResults(str)
+                console.log("Results processed: " + new Date(Date.now()).toISOString())
             }
 
             function displayResults(str)
@@ -39,8 +40,9 @@
                 var blob = new Blob([contents], {type: mime_type});
 
                 var dlink = document.createElement('a');
-                dlink.download = name;
-                dlink.href = window.URL.createObjectURL(blob);
+                dlink.download = name 
+                var url = window.URL.createObjectURL(blob);
+                dlink.href = url
                 dlink.onclick = function(e) {
                     // revokeObjectURL needs a delay to work properly
                     var that = this;
@@ -60,22 +62,28 @@
                 await init();
                 //From here on we can call functions defined in wasm.
                 document.getElementById("file_chooser").onchange = function () { 
+                    console.log("File submitted: "+new Date(Date.now()).toISOString())
                     const chooser = document.getElementById("file_chooser")
-                    console.log("File has been chosen.")
-                    analyze_file(chooser)
+                    try {
+                        analyze_file(chooser)
+                    } catch (error) { console.error(error); alert(error) }
                     chooser.value = null // this is needed otherwise the event will not fire if the user reloads the same file. Looks like it's safe to do it that way: https://stackoverflow.com/questions/3528359/html-input-type-file-file-selection-event
                 }
 
                 document.getElementById("send_data_button").onclick = function () {  
+                    const startTime = Date.now();
                     console.log("Data submitted.")
                     const data = document.getElementById("data_as_txt").value
-                    console.log("Data to send:\n"+ data)
-                    if (document.getElementById('csv_radio').checked) {
-                        analyze_csv_string(data)
-                    }
-                    else {
-                        analyze_string(data)
-                    }
+                    // console.log("Data to send:\n"+ data)
+                    try {
+                        if (document.getElementById('csv_radio').checked) {
+                            analyze_csv_string(data)
+                        }
+                        else {
+                            analyze_string(data)
+                        }
+                    } catch (error) {console.error(error); alert(error) }
+                    console.log("Execution time: " + (Date.now() - startTime))
                 };
             }
             run();
@@ -86,7 +94,7 @@
 
         <input type="file"
                id="file_chooser" name="file_chooser"
-               accept="text/csv, .ttl">
+               accept="text/csv, .ttl" style="color: transparent;">
 
         <form id="data_form">
                 <p><label for="data_as_txt">Enter data:</label></p>
