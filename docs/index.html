@@ -2,6 +2,7 @@
 <html>
     <head>
         <meta content="text/html;charset=utf-8" http-equiv="Content-Type"/>
+        <link rel="stylesheet" href="style.css">
     </head>
     <body>
         <script>
@@ -89,15 +90,16 @@
             run();
         </script>
 
-
-        <label for="avatar">Choose a file:</label>
+    <div id="main">
+        <div><label for="avatar">Choose a file to analyze:</label>
 
         <input type="file"
                id="file_chooser" name="file_chooser"
                accept="text/csv, .ttl" style="color: transparent;">
+        </div>
 
         <form id="data_form">
-                <p><label for="data_as_txt">Enter data:</label></p>
+                <p><label for="data_as_txt">... or enter data below:</label></p>
                 <input type="radio" id="csv_radio" name="data_type_radio" value="CSV" checked>
                 <label for="csv_radio">CSV</label>
                 <input type="radio" id="rdf_ttl_radio" name="data_type_radio" value="RDF/TTL">
@@ -120,8 +122,8 @@
                 <input type="button" value="Submit" id="send_data_button">
         </form>
         
-        
-        <div>RESULTS to be loaded here...<pre id="results">NO DATA TO SHOW  </pre></div>
+        <div><pre id="results">NO RESULTS TO SHOW.</pre></div>
+    </div>    
         
 
     </body>

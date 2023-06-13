@@ -6,6 +6,7 @@ mod csv_to_rdf;
 //  cargo build --target wasm32-unknown-unknown
 //  wasm-bindgen target/wasm32-unknown-unknown/debug/wasm_oxi_time.wasm --out-dir ./web/ --target web
 //  wasm-bindgen target/wasm32-unknown-unknown/release/wasm_oxi_time.wasm --out-dir ./web/ --target web
+//  wasm-bindgen target/wasm32-unknown-unknown/release/wasm_oxi_time.wasm --out-dir ./docs/ --target web
 
 // HOW to run? Go to ./web and run Python server: python3 -m http.server  
 
@@ -17,7 +18,7 @@ mod csv_to_rdf;
 #[wasm_bindgen]
 pub fn analyze_file(file_input: web_sys::HtmlInputElement) -> Result<(), JsError> {
 
-    log("Starting processing... v.0.1.1");
+    log("Starting processing... v.0.1.2");
     let filelist = file_input.files().expect_throw("No file given.");
     filelist.get(0).expect_throw("Please select a valid file");
     
