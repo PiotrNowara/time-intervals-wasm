@@ -18,7 +18,7 @@ mod csv_to_rdf;
 #[wasm_bindgen]
 pub fn analyze_file(file_input: web_sys::HtmlInputElement) -> Result<(), JsError> {
 
-    log("Starting processing... v.0.1.2");
+    log("Starting processing... v.0.1.3");
     let filelist = file_input.files().expect_throw("No file given.");
     filelist.get(0).expect_throw("Please select a valid file");
     
@@ -64,7 +64,7 @@ pub fn analyze_file(file_input: web_sys::HtmlInputElement) -> Result<(), JsError
 
 #[wasm_bindgen]
 pub fn analyze_string(input_string: String) -> Result<(), JsError> {
-    log("Starting processing... v.0.1.1");
+    log("Starting processing... v.0.1.3");
     if input_string.is_empty() {
         alert("Please enter a non-empty RDF data string.");
         JsError::new("Please enter a non-empty RDF data string.");
@@ -78,7 +78,7 @@ pub fn analyze_string(input_string: String) -> Result<(), JsError> {
 
 #[wasm_bindgen]
 pub fn analyze_csv_string(input_string: String) -> Result<(), JsError> {
-    log("Starting processing... v.0.1.1");
+    log("Starting processing... v.0.1.3");
     if input_string.is_empty() {
         alert("Please enter a non-empty CSV data string.");
         JsError::new("Please enter a non-empty CSV data string.");
