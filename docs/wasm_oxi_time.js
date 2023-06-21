@@ -212,11 +212,17 @@ function __wbg_adapter_24(arg0, arg1, arg2) {
 
 /**
 * @param {HTMLInputElement} file_input
+* @param {string} start_date_prop_name
+* @param {string} end_date_prop_name
 */
-export function analyze_file(file_input) {
+export function analyze_file(file_input, start_date_prop_name, end_date_prop_name) {
     try {
         const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
-        wasm.analyze_file(retptr, addHeapObject(file_input));
+        const ptr0 = passStringToWasm0(start_date_prop_name, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ptr1 = passStringToWasm0(end_date_prop_name, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len1 = WASM_VECTOR_LEN;
+        wasm.analyze_file(retptr, addHeapObject(file_input), ptr0, len0, ptr1, len1);
         var r0 = getInt32Memory0()[retptr / 4 + 0];
         var r1 = getInt32Memory0()[retptr / 4 + 1];
         if (r1) {
@@ -229,13 +235,19 @@ export function analyze_file(file_input) {
 
 /**
 * @param {string} input_string
+* @param {string} start_date_prop_name
+* @param {string} end_date_prop_name
 */
-export function analyze_string(input_string) {
+export function analyze_string(input_string, start_date_prop_name, end_date_prop_name) {
     try {
         const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
         const ptr0 = passStringToWasm0(input_string, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         const len0 = WASM_VECTOR_LEN;
-        wasm.analyze_string(retptr, ptr0, len0);
+        const ptr1 = passStringToWasm0(start_date_prop_name, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len1 = WASM_VECTOR_LEN;
+        const ptr2 = passStringToWasm0(end_date_prop_name, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len2 = WASM_VECTOR_LEN;
+        wasm.analyze_string(retptr, ptr0, len0, ptr1, len1, ptr2, len2);
         var r0 = getInt32Memory0()[retptr / 4 + 0];
         var r1 = getInt32Memory0()[retptr / 4 + 1];
         if (r1) {
@@ -484,8 +496,8 @@ function getImports() {
         const ret = wasm.memory;
         return addHeapObject(ret);
     };
-    imports.wbg.__wbindgen_closure_wrapper153 = function(arg0, arg1, arg2) {
-        const ret = makeClosure(arg0, arg1, 43, __wbg_adapter_24);
+    imports.wbg.__wbindgen_closure_wrapper138 = function(arg0, arg1, arg2) {
+        const ret = makeClosure(arg0, arg1, 46, __wbg_adapter_24);
         return addHeapObject(ret);
     };
 

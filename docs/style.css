@@ -10,11 +10,7 @@ div {
     clear: both;
 }
 
-#status, #tip_panel{
-    font-size: x-small;
-}
-
-#tip_panel{
+#status, #tip_panel {
     font-size: x-small;
 }
 
@@ -27,6 +23,8 @@ div {
     padding-top:0;
 }
 
+#rdf_prop_names {display: none; font-size: small;}
+
 form {
     position: relative;
     float: left; 
@@ -35,3 +33,4 @@ form {
     box-sizing: border-box;
     background: transparent ;
   }
+

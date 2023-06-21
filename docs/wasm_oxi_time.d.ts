@@ -2,12 +2,16 @@
 /* eslint-disable */
 /**
 * @param {HTMLInputElement} file_input
+* @param {string} start_date_prop_name
+* @param {string} end_date_prop_name
 */
-export function analyze_file(file_input: HTMLInputElement): void;
+export function analyze_file(file_input: HTMLInputElement, start_date_prop_name: string, end_date_prop_name: string): void;
 /**
 * @param {string} input_string
+* @param {string} start_date_prop_name
+* @param {string} end_date_prop_name
 */
-export function analyze_string(input_string: string): void;
+export function analyze_string(input_string: string, start_date_prop_name: string, end_date_prop_name: string): void;
 /**
 * @param {string} input_string
 */
@@ -17,8 +21,8 @@ export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembl
 
 export interface InitOutput {
   readonly memory: WebAssembly.Memory;
-  readonly analyze_file: (a: number, b: number) => void;
-  readonly analyze_string: (a: number, b: number, c: number) => void;
+  readonly analyze_file: (a: number, b: number, c: number, d: number, e: number, f: number) => void;
+  readonly analyze_string: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => void;
   readonly analyze_csv_string: (a: number, b: number, c: number) => void;
   readonly __wbindgen_malloc: (a: number) => number;
   readonly __wbindgen_realloc: (a: number, b: number, c: number) => number;

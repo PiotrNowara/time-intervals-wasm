@@ -22,8 +22,10 @@
             function displayResults(str)
             {
                 var resToDisplay = "Too many results to display. Please check the downloaded results file.";
-                if(str.length <= 3000)
-                {
+                if(str === "") {
+                    resToDisplay = "NO RESULTS TO SHOW."
+                }
+                else if(str.length <= 3000) {
                     resToDisplay = escapeHtml(str)
                 }              
                 document.getElementById("results").innerHTML = resToDisplay
@@ -66,6 +68,14 @@
                 dlink.click();
                 dlink.remove();
             }
+
+            function enterRdfMode() {
+                if (document.getElementById('rdf_ttl_radio').checked) {
+                    document.getElementById('rdf_prop_names').style.display = "block";
+                } else {
+                    document.getElementById('rdf_prop_names').style.display = "none";
+                }
+            }
         </script>
 
         <script type="module">
@@ -80,7 +90,7 @@
                     document.getElementById("results").innerHTML = ""
                     const chooser = document.getElementById("file_chooser")
                     try {
-                        analyze_file(chooser)
+                        analyze_file(chooser, document.getElementById("start_date_prop_name").value, document.getElementById("end_date_prop_name").value)
                     } catch (error) { console.error(error); alert(error) }
                     chooser.value = null // this is needed otherwise the event will not fire if the user reloads the same file. Looks like it's safe to do it that way: https://stackoverflow.com/questions/3528359/html-input-type-file-file-selection-event
                 }
@@ -100,7 +110,7 @@
                             analyze_csv_string(data)
                         }
                         else {
-                            analyze_string(data)
+                            analyze_string(data, document.getElementById("start_date_prop_name").value, document.getElementById("end_date_prop_name").value)
                         }
                     } catch (error) {console.error(error); alert(error) }
                     console.log("Execution time: " + (Date.now() - startTime))
@@ -120,9 +130,9 @@
 
         <form id="data_form">
                 <p><label for="data_as_txt">... or enter data below:</label></p>
-                <input type="radio" id="csv_radio" name="data_type_radio" value="CSV" checked>
+                <input type="radio" id="csv_radio" name="data_type_radio" value="CSV" onclick="javascript:enterRdfMode();" checked>
                 <label for="csv_radio">CSV</label>
-                <input type="radio" id="rdf_ttl_radio" name="data_type_radio" value="RDF/TTL">
+                <input type="radio" id="rdf_ttl_radio" name="data_type_radio" value="RDF/TTL" onclick="javascript:enterRdfMode();">
                 <label for="rdf_ttl_radio">RDF/TTL</label><br>
                 <textarea id="data_as_txt" name="data_as_txt" rows="10" cols="150">id,start_time,end_time
 "7","2022-08-25","2022-08-28"
@@ -138,14 +148,27 @@
 "a9",2021-08-12T00:00:00,2021-08-14T00:00:00
 "ab",2021-06-20T00:00:00,2021-06-30T00:00:00
 </textarea>
-                <br>
-                <input type="button" value="Submit" id="send_data_button">
+            <br>
+            <span id="rdf_prop_names">
+                <label for="start_date_prop_name">Start date RDF property name:</label><input type="text" id="start_date_prop_name" name="start_date_prop_name" value="baseUrl:startDate"/><br>
+                <label for="end_date_prop_name">End date RDF property name:</label><input type="text" id="end_date_prop_name" name="end_date_prop_name" value="baseUrl:endDate" /><br>
+            </span>
+            <input type="button" value="Submit" id="send_data_button">
         </form>
         <div id="tip_panel">
+            <p>Click submit to run the process which will find following properties in the submitted file or data and return RDF triples:</p>
+            <ul>
+                <li><a href="https://www.w3.org/TR/owl-time/#time:intervalOverlaps">intervalOverlaps</a></li>
+                <li><a href="https://www.w3.org/TR/owl-time/#time:intervalContains">intervalContains</a></li>
+                <li><a href="https://www.w3.org/TR/owl-time/#time:intervalMeets">intervalMeets</a></li>
+                <li><a href="https://www.w3.org/TR/owl-time/#time:intervalOverlaps">intervalIn</a></li>
+            </ul>
+            <p>Some tips:</p>
             <ul><li>Data is being processed inside your browser on your computer.</li>
                 <li>Use the file chooser for analyzing bigger volumes of data.</li>
                 <li>Analyzing more than 10k of events might take a few minutes depending on your browser and the CPU and RAM resources available.</li>
-                <li>When dealing  with larger datasetIf possible split larger dataset into multiple files (with related data) and analyze them separately.</li>
+                <li>When dealing with a larger dataset split it into multiple files (grouping related data) and analyze it separately if possible.</li>
+                <li>Results will be automatically downloaded.</li>
             </ul>
         </div>
         <div id="status"></div>

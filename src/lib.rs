@@ -16,7 +16,7 @@ mod csv_to_rdf;
 // SPARQL is type sensitive so using "2022-08-10" as a xsd:dateTime will not work (pattern will not be matched) - exact timestamps or dates have to be provided. Data will be transformed according to provided values.
 
 #[wasm_bindgen]
-pub fn analyze_file(file_input: web_sys::HtmlInputElement) -> Result<(), JsError> {
+pub fn analyze_file(file_input: web_sys::HtmlInputElement, start_date_prop_name: String, end_date_prop_name: String) -> Result<(), JsError> {
 
     log("Starting processing... v.0.1.3");
     let filelist = file_input.files().expect_throw("No file given.");
@@ -50,7 +50,7 @@ pub fn analyze_file(file_input: web_sys::HtmlInputElement) -> Result<(), JsError
                 .map_err(|e| JsError::new(&format!("Error when processing CSV data input string: {}", e.to_string())))?;
         }
         // log(&format!("RDF content: {:?}", std::str::from_utf8(&slice).unwrap()));
-        let res_str = oxi_db::process_data(&slice)
+        let res_str = oxi_db::process_data(&slice, &start_date_prop_name, &end_date_prop_name)
             .map_err(|e| JsError::new(&format!("Error when processing RDF data input string: {}", e.to_string())))?;
         handleResult(&res_str);
         Ok(())
@@ -63,14 +63,14 @@ pub fn analyze_file(file_input: web_sys::HtmlInputElement) -> Result<(), JsError
 }
 
 #[wasm_bindgen]
-pub fn analyze_string(input_string: String) -> Result<(), JsError> {
+pub fn analyze_string(input_string: String, start_date_prop_name: String, end_date_prop_name: String) -> Result<(), JsError> {
     log("Starting processing... v.0.1.3");
     if input_string.is_empty() {
         alert("Please enter a non-empty RDF data string.");
         JsError::new("Please enter a non-empty RDF data string.");
     }
     log("In process...");
-    let res_str = oxi_db::process_data(input_string.as_bytes())
+    let res_str = oxi_db::process_data(input_string.as_bytes(), &start_date_prop_name, &end_date_prop_name)
         .map_err(|e| JsError::new(&format!("Error when processing RDF data input string: {}", e.to_string())))?;
     handleResult(&res_str);
     Ok(())
@@ -88,7 +88,7 @@ pub fn analyze_csv_string(input_string: String) -> Result<(), JsError> {
     let st = csv_to_rdf::csv_to_rdf(input_string.as_bytes())
         .map_err(|e| JsError::new(&format!("Error when processing CSV data input string: {}", e.to_string())))?;
     // log(&format!("RDF content: {:?}", std::str::from_utf8(&st).unwrap()));//TODO: delete after testing
-    let res_str = oxi_db::process_data(&st)
+    let res_str = oxi_db::process_data(&st, "baseUrl:startDate", "baseUrl:endDate")
         .map_err(|e| JsError::new(&format!("Error when processing RDF data input string: {}", e.to_string())))?;
     handleResult(&res_str);
     Ok(())
