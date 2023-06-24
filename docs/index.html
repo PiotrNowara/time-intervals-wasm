@@ -6,7 +6,8 @@
     </head>
     <body>
         <script>
-
+            var csvData = "id,start_time,end_time\n\"7\",\"2022-08-25\",\"2022-08-28\"\n\"6\",\"2022-08-26\",\"2022-08-31\"\n\"9\",\"2022-06-20\",\"2022-06-25\"\n\"b\",\"2022-06-20\",\"2022-06-30\"\n\"a7\",2021-08-25T00:00:00,2021-08-28T00:00:00\n\"a6\",2021-08-26T00:00:00,2021-08-31T00:00:00\n\"ab\",2021-06-20T00:00:00,2021-06-30T00:00:00\n\"a9\",2021-08-12T00:00:00,2021-08-14T00:00:00\n"
+            var rdfData = "@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .\n@prefix baseUrl: <http://example.data/event/>.\nbaseUrl:de105920-461f-495c-bf60-293fc2a45d801 baseUrl:id \"de105920-461f-495c-bf60-293fc2a45d80\"; baseUrl:startDate \"2014-12-16T02:50:21Z\"^^xsd:dateTime; baseUrl:endDate \"2014-12-17T21:41:58Z\"^^xsd:dateTime.\nbaseUrl:223c0285-3f95-48fa-80f6-069e4ae3cc0b baseUrl:id \"223c0285-3f95-48fa-80f6-069e4ae3cc0b\"; baseUrl:startDate \"2014-08-24T11:07:13Z\"^^xsd:dateTime; baseUrl:endDate \"2014-12-27T08:43:58Z\"^^xsd:dateTime."
             //This fn is imported in Rust! don't change the name!
             function handleResult(str) {
                 // console.log("Handling result in JS...\n" + str)
@@ -41,14 +42,6 @@
                     .replace(/'/g, "&#039;");
             }
 
-            // function initFile()  {
-            //     // alert("fdfsafs")
-            //     var msg = new Date(Date.now()).toLocaleString() + " baba File submitted."
-            //     console.log(msg)
-            //     document.getElementById("status").innerHTML = msg
-            //     document.getElementById("results").innerHTML = ""
-            // }
-
             function download_file(name, contents, mime_type) {
                 // mime_type = mime_type || "application/json";
                 var blob = new Blob([contents], {type: mime_type});
@@ -69,11 +62,13 @@
                 dlink.remove();
             }
 
-            function enterRdfMode() {
+            function switchDataMode() {
                 if (document.getElementById('rdf_ttl_radio').checked) {
                     document.getElementById('rdf_prop_names').style.display = "block";
+                    document.getElementById("data_as_txt").value = rdfData;
                 } else {
                     document.getElementById('rdf_prop_names').style.display = "none";
+                    document.getElementById("data_as_txt").value = csvData;
                 }
             }
         </script>
@@ -86,6 +81,7 @@
                 document.getElementById("file_chooser").onchange = function () { 
                     var msg = new Date(Date.now()).toLocaleString() + " File submitted."
                     console.log(msg)
+                    console.log(document.getElementById("start_date_prop_name").value)
                     document.getElementById("status").innerHTML = msg
                     document.getElementById("results").innerHTML = ""
                     const chooser = document.getElementById("file_chooser")
@@ -121,7 +117,7 @@
 
     <div id="main">
         <div id="file_panel">
-            <label for="avatar">Choose a file to analyze:</label>
+            <label for="avatar">Choose a CSV or RDF/TTL file to analyze:</label>
 
             <input type="file"
                id="file_chooser" name="file_chooser"
@@ -130,29 +126,24 @@
 
         <form id="data_form">
                 <p><label for="data_as_txt">... or enter data below:</label></p>
-                <input type="radio" id="csv_radio" name="data_type_radio" value="CSV" onclick="javascript:enterRdfMode();" checked>
+                <input type="radio" id="csv_radio" name="data_type_radio" value="CSV" onclick="javascript:switchDataMode();" checked>
                 <label for="csv_radio">CSV</label>
-                <input type="radio" id="rdf_ttl_radio" name="data_type_radio" value="RDF/TTL" onclick="javascript:enterRdfMode();">
+                <input type="radio" id="rdf_ttl_radio" name="data_type_radio" value="RDF/TTL" onclick="javascript:switchDataMode();">
                 <label for="rdf_ttl_radio">RDF/TTL</label><br>
+                <span id="rdf_prop_names">
+                    <label for="start_date_prop_name">Start date RDF property name:</label><input type="text" id="start_date_prop_name" name="start_date_prop_name" value="baseUrl:startDate"/><br>
+                    <label for="end_date_prop_name">End date RDF property name:</label><input type="text" id="end_date_prop_name" name="end_date_prop_name" value="baseUrl:endDate" /><br>
+                </span>
                 <textarea id="data_as_txt" name="data_as_txt" rows="10" cols="150">id,start_time,end_time
 "7","2022-08-25","2022-08-28"
 "6","2022-08-26","2022-08-31"
-"e","2022-12-10","2022-12-15"
 "9","2022-06-20","2022-06-25"
-"9","2022-08-12","2022-08-14"
 "b","2022-06-20","2022-06-30"
 "a7",2021-08-25T00:00:00,2021-08-28T00:00:00
 "a6",2021-08-26T00:00:00,2021-08-31T00:00:00
-"ae",2021-12-10T00:00:00,2021-12-15T00:00:00
-"a9",2021-06-20T00:00:00,2021-06-25T00:00:00
-"a9",2021-08-12T00:00:00,2021-08-14T00:00:00
 "ab",2021-06-20T00:00:00,2021-06-30T00:00:00
-</textarea>
-            <br>
-            <span id="rdf_prop_names">
-                <label for="start_date_prop_name">Start date RDF property name:</label><input type="text" id="start_date_prop_name" name="start_date_prop_name" value="baseUrl:startDate"/><br>
-                <label for="end_date_prop_name">End date RDF property name:</label><input type="text" id="end_date_prop_name" name="end_date_prop_name" value="baseUrl:endDate" /><br>
-            </span>
+"a9",2021-08-12T00:00:00,2021-08-14T00:00:00
+</textarea><br>
             <input type="button" value="Submit" id="send_data_button">
         </form>
         <div id="tip_panel">
