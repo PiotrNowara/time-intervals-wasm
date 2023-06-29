@@ -6,7 +6,7 @@
     </head>
     <body>
         <script>
-            var csvData = "id,start_time,end_time\n\"7\",\"2022-08-25\",\"2022-08-28\"\n\"6\",\"2022-08-26\",\"2022-08-31\"\n\"9\",\"2022-06-20\",\"2022-06-25\"\n\"b\",\"2022-06-20\",\"2022-06-30\"\n\"a7\",2021-08-25T00:00:00,2021-08-28T00:00:00\n\"a6\",2021-08-26T00:00:00,2021-08-31T00:00:00\n\"ab\",2021-06-20T00:00:00,2021-06-30T00:00:00\n\"a9\",2021-08-12T00:00:00,2021-08-14T00:00:00\n"
+            var csvData = "id,start_time,end_time\n\"d1\",\"2022-08-25\",\"2022-08-28\"\n\"d2\",\"2022-08-26\",\"2022-08-31\"\n\"d3\",\"2022-06-20\",\"2022-06-25\"\n\"d4\",\"2022-06-20\",\"2022-06-30\"\n\"t1\",2021-08-25T00:00:00,2021-08-28T00:00:00\n\"t2\",2021-08-26T00:00:00,2021-08-31T00:00:00\n\"t3\",2021-06-20T00:00:00,2021-06-30T01:00:00\n\"t4\",2021-06-20T01:00:00,2021-06-30T00:00:00\n"
             var rdfData = "@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .\n@prefix baseUrl: <http://example.data/event/>.\nbaseUrl:de105920-461f-495c-bf60-293fc2a45d801 baseUrl:id \"de105920-461f-495c-bf60-293fc2a45d80\"; baseUrl:startDate \"2014-12-16T02:50:21Z\"^^xsd:dateTime; baseUrl:endDate \"2014-12-17T21:41:58Z\"^^xsd:dateTime.\nbaseUrl:223c0285-3f95-48fa-80f6-069e4ae3cc0b baseUrl:id \"223c0285-3f95-48fa-80f6-069e4ae3cc0b\"; baseUrl:startDate \"2014-08-24T11:07:13Z\"^^xsd:dateTime; baseUrl:endDate \"2014-12-27T08:43:58Z\"^^xsd:dateTime."
             //This fn is imported in Rust! don't change the name!
             function handleResult(str) {
@@ -115,7 +115,8 @@
             run();
         </script>
 
-    <div id="main">
+<div id="main">
+        <h1>Time interval finder</h1>
         <div id="file_panel">
             <label for="avatar">Choose a CSV or RDF/TTL file to analyze:</label>
 
@@ -125,7 +126,7 @@
         </div>
 
         <form id="data_form">
-                <p><label for="data_as_txt">... or enter data below:</label></p>
+                <p><label for="data_as_txt">... or enter/edit data below:</label></p>
                 <input type="radio" id="csv_radio" name="data_type_radio" value="CSV" onclick="javascript:switchDataMode();" checked>
                 <label for="csv_radio">CSV</label>
                 <input type="radio" id="rdf_ttl_radio" name="data_type_radio" value="RDF/TTL" onclick="javascript:switchDataMode();">
@@ -135,26 +136,33 @@
                     <label for="end_date_prop_name">End date RDF property name:</label><input type="text" id="end_date_prop_name" name="end_date_prop_name" value="baseUrl:endDate" /><br>
                 </span>
                 <textarea id="data_as_txt" name="data_as_txt" rows="10" cols="150">id,start_time,end_time
-"7","2022-08-25","2022-08-28"
-"6","2022-08-26","2022-08-31"
-"9","2022-06-20","2022-06-25"
-"b","2022-06-20","2022-06-30"
-"a7",2021-08-25T00:00:00,2021-08-28T00:00:00
-"a6",2021-08-26T00:00:00,2021-08-31T00:00:00
-"ab",2021-06-20T00:00:00,2021-06-30T00:00:00
-"a9",2021-08-12T00:00:00,2021-08-14T00:00:00
+"d1","2022-08-25","2022-08-28"
+"d2","2022-08-26","2022-08-31"
+"d3","2022-06-20","2022-06-25"
+"d4","2022-06-20","2022-06-30"
+"t1",2021-08-25T00:00:00,2021-08-28T00:00:00
+"t2",2021-08-26T00:00:00,2021-08-31T00:00:00
+"t3",2021-06-20T00:00:00,2021-06-30T01:00:00
+"t4",2021-06-20T01:00:00,2021-06-30T00:00:00
 </textarea><br>
             <input type="button" value="Submit" id="send_data_button">
         </form>
+        <div id="status"></div>
+        <div id="results_panel"><pre id="results">NO RESULTS TO SHOW.</pre></div>
         <div id="tip_panel">
             <p>Click submit to run the process which will find following properties in the submitted file or data and return RDF triples:</p>
             <ul>
                 <li><a href="https://www.w3.org/TR/owl-time/#time:intervalOverlaps">intervalOverlaps</a></li>
                 <li><a href="https://www.w3.org/TR/owl-time/#time:intervalContains">intervalContains</a></li>
                 <li><a href="https://www.w3.org/TR/owl-time/#time:intervalMeets">intervalMeets</a></li>
-                <li><a href="https://www.w3.org/TR/owl-time/#time:intervalOverlaps">intervalIn</a></li>
+                <li><a href="https://www.w3.org/TR/owl-time/#time:intervalIn">intervalIn</a></li>
             </ul>
-            <p>Some tips:</p>
+            <p>Data Requirements:</p>
+            <ul><li>Data can be submitted as CSV or RDF (RDF/TTL format).</li>
+                <li>CSV data must be comma separated and contain start_time and end_time columns.</li>
+                <li>start/end time can be either xsd:date or xsd:dateTime (it's possible to mix types in a submitted dataset but calculating intervals will only work for events with the same types).</li>
+            </ul>
+            <p>Details:</p>
             <ul><li>Data is being processed inside your browser on your computer.</li>
                 <li>Use the file chooser for analyzing bigger volumes of data.</li>
                 <li>Analyzing more than 10k of events might take a few minutes depending on your browser and the CPU and RAM resources available.</li>
@@ -162,10 +170,8 @@
                 <li>Results will be automatically downloaded.</li>
             </ul>
         </div>
-        <div id="status"></div>
-        <div id="results_panel"><pre id="results">NO RESULTS TO SHOW.</pre></div>
     </div>    
-        
+  
 
     </body>
 </html>

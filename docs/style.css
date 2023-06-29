@@ -19,7 +19,7 @@ div {
 }
 
 #results_panel {
-    border-top: solid 1px;
+    border-bottom: solid 1px;
     padding-top:0;
 }
 
