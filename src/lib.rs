@@ -4,8 +4,6 @@ mod csv_to_rdf;
 
 // How to build?
 //  cargo build --target wasm32-unknown-unknown
-//  wasm-bindgen target/wasm32-unknown-unknown/debug/wasm_oxi_time.wasm --out-dir ./web/ --target web
-//  wasm-bindgen target/wasm32-unknown-unknown/release/wasm_oxi_time.wasm --out-dir ./web/ --target web
 //  wasm-bindgen target/wasm32-unknown-unknown/release/wasm_oxi_time.wasm --out-dir ./docs/ --target web
 
 // HOW to run? Go to ./web and run Python server: python3 -m http.server  
@@ -39,7 +37,7 @@ pub fn analyze_file(file_input: web_sys::HtmlInputElement, start_date_prop_name:
     let onloadend_cb = Closure::wrap(Box::new(move |_e: web_sys::ProgressEvent| {
         let array = js_sys::Uint8Array::new(&fr_c.result().expect_throw("Error when processing CSV data input string: {}"));
         let mut slice = vec![0; array.length() as usize];
-        array.copy_to(&mut slice[..]); //TODO: if this does not work then use array.to_vec()
+        array.copy_to(&mut slice[..]);
 
         // handler code
         log(&format!("In process... file: {}", filename));
@@ -101,14 +99,13 @@ extern "C" {
     fn alert(s: &str);
 }
 
-// my custome function implemented on the JS side
+// custom function implemented on the JS side
 #[wasm_bindgen]
 extern "C" {
     fn handleResult(s: &str);
 }
 
 // log handling taken from: https://rustwasm.github.io/wasm-bindgen/examples/console-log.html
-// TODO: add a Rust fn that would add a timestamp
 #[wasm_bindgen]
 extern "C" {
     // Use `js_namespace` here to bind `console.log(..)` instead of just
