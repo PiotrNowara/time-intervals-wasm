@@ -1,10 +1,10 @@
-use oxigraph::sparql::{QueryResultsFormat, QueryResults};
+use oxigraph::sparql::QueryResults;
 use oxigraph::model::*;
 use oxigraph::io::GraphFormat;
 use std::error::Error;
-use std::io::{BufReader, BufWriter};
+use std::io::BufReader;
 use std::str;
-use oxigraph::store::{StorageError, Store};
+use oxigraph::store::Store;
 
 // IMPORTANT! FOR Server version use in CL:
 // oxigraph_server --location ./oxi_server_data serve
@@ -12,25 +12,6 @@ use oxigraph::store::{StorageError, Store};
 const SELECT_EVENTS: &str = "PREFIX time: <http://www.w3.org/2006/time#>
 PREFIX baseUrl: <http://example.data/event/>
 SELECT ?e1 ?st1 ?end1 WHERE {  ?e1 _START_DATE_PLACEHOLDER_ ?st1 ; _END_DATE_PLACEHOLDER_ ?end1 .}";
-
-const CONSTRUCT_ALL_FOR_GIVEN_EVENT1: &str = "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
-PREFIX time: <http://www.w3.org/2006/time#>
-PREFIX baseUrl: <http://example.data/event/>
-CONSTRUCT {?e1 ?timeInterval ?e2.}
-WHERE {
-    ?e2 _START_DATE_PLACEHOLDER_ ?st2 ;
-        _END_DATE_PLACEHOLDER_ ?end2 . 
-  BIND(_E1_PLACEHOLDER_  AS ?e1)
-  FILTER(?e1 != ?e2)
-  BIND(_ST1_PLACEHOLDER_ < ?st2 && _END1_PLACEHOLDER_ > ?st2 && _END1_PLACEHOLDER_ < ?end2 AS ?intervalOverlaps)
-  BIND(_END1_PLACEHOLDER_ = ?st2 AS ?intervalMeets)
-  BIND(_ST1_PLACEHOLDER_ < ?st2 && _END1_PLACEHOLDER_ > ?end2 AS ?intervalContains)
-  BIND(_ST1_PLACEHOLDER_ >= ?st2 && _END1_PLACEHOLDER_ <= ?end2 && !(_ST1_PLACEHOLDER_ = ?st2 && _END1_PLACEHOLDER_ = ?end2) AS ?intervalIn)
-  FILTER (?intervalOverlaps || ?intervalMeets || ?intervalContains || ?intervalIn)
-  BIND(IF(?intervalOverlaps, time:intervalOverlaps, 
-      	IF(?intervalMeets, time:intervalMeets, 
-        IF(?intervalContains, time:intervalContains, time:intervalIn))) AS ?timeInterval)
-} LIMIT 100000";
 
 const CONSTRUCT_ALL_FOR_GIVEN_EVENT: &str = "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 PREFIX time: <http://www.w3.org/2006/time#>
@@ -48,30 +29,6 @@ WHERE {
   FILTER(?timeInterval != -1)
 } LIMIT 100000";
 
-// slightly slower
-const C2:&str = "
-PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
-PREFIX time: <http://www.w3.org/2006/time#>
-PREFIX baseUrl: <http://example.data/event/>
-CONSTRUCT {?e1 ?timeInterval ?e2.}
-WHERE {
-  {
-    {
-    SELECT ?e1 ?e2 ?timeInterval WHERE {?e2 _START_DATE_PLACEHOLDER_ ?st2 ; _END_DATE_PLACEHOLDER_ ?end2 . BIND(_E1_PLACEHOLDER_  AS ?e1).  FILTER(?e1 != ?e2). FILTER(_ST1_PLACEHOLDER_ < ?st2 && _END1_PLACEHOLDER_ > ?st2 && _END1_PLACEHOLDER_ < ?end2)  . BIND(time:intervalOverlaps AS ?timeInterval).  
-    }}
-    UNION
-    {SELECT ?e1 ?e2  ?timeInterval WHERE {?e2 _START_DATE_PLACEHOLDER_ ?st2 ; _END_DATE_PLACEHOLDER_ ?end2 . BIND(_E1_PLACEHOLDER_  AS ?e1). FILTER(?e1 != ?e2). FILTER(_END1_PLACEHOLDER_ = ?st2) .BIND(time:intervalMeets AS ?timeInterval). 
-    }}
-    UNION
-    {SELECT ?e1 ?e2 ?timeInterval WHERE {?e2 _START_DATE_PLACEHOLDER_ ?st2 ; _END_DATE_PLACEHOLDER_ ?end2 . BIND(_E1_PLACEHOLDER_  AS ?e1). FILTER(?e1 != ?e2). FILTER(_ST1_PLACEHOLDER_ < ?st2 && _END1_PLACEHOLDER_ > ?end2)  BIND(time:intervalContains AS ?timeInterval). 
-    }}
-    UNION
-    {SELECT ?e1 ?e2  ?timeInterval WHERE {?e2 _START_DATE_PLACEHOLDER_ ?st2 ; _END_DATE_PLACEHOLDER_ ?end2 . BIND(_E1_PLACEHOLDER_  AS ?e1).  FILTER(?e1 != ?e2) .
-    FILTER(_ST1_PLACEHOLDER_ >= ?st2 && _END1_PLACEHOLDER_ <= ?end2 && !(_ST1_PLACEHOLDER_ = ?st2 && _END1_PLACEHOLDER_ = ?end2)).
-    BIND(time:intervalIn AS ?timeInterval)
-    }}
-  }
-} LIMIT 100000";
 
 pub fn process_data(data: &[u8], start_date_prop_name: &str, end_date_prop_name: &str) -> Result<String,Box<dyn Error>>
 {
@@ -112,7 +69,6 @@ pub fn check_event(store: &Store, event: &NamedNode, start_time: &Literal, end_t
         .replace("_ST1_PLACEHOLDER_", start_time_st.as_str())
         .replace("_END1_PLACEHOLDER_", end_time_st.as_str())
         .replace("_E1_PLACEHOLDER_", event_url.as_str());
-    // println!("Query: {}", construct_query);
     let res_graph = store.query(&construct_query)?;
     let mut buf = Vec::new();
     res_graph.write_graph(&mut buf, GraphFormat::Turtle)?;
@@ -152,3 +108,4 @@ mod tests {
     }
 
 }
+

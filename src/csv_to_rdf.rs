@@ -1,4 +1,4 @@
-use std::{error::Error};
+use std::error::Error;
 use uuid::Uuid;
 
 const BASE_URL:&str = "http://example.data/event/";
